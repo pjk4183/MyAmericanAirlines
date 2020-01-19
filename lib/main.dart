@@ -619,9 +619,9 @@ class _flightState extends State<FlightInfoScreen> {
           dest_city = flight.dest_city;
           dest_code = flight.dest_code;
           departureTime = flight.departureTime.split('T')[1].split('.')[0];
-          origin_timezone = flight.origin_timezone;
+          origin_timezone = flight.origin_timezone.split('/')[0];
           arrivalTime = flight.arrivalTime.split('T')[1].split('.')[0];
-          dest_timezone = flight.dest_timezone;
+          dest_timezone = flight.dest_timezone.split('/')[0];
           duration_h = flight.duration_h;
           duration_m = flight.duration_m;
         });

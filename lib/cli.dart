@@ -650,7 +650,9 @@ String CityToCode(String city){
     'Jackson Hole':'JAC',
     'JAC':'JAC',
     'Rock Springs':'RKS',
-    'RKS':'RKS'
+    'RKS':'RKS',
+    'Tucson':'TUS',
+    'Phoenix': 'PHX'
   };
 
   //print(MapCode['Tucson']);

@@ -8,8 +8,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'American Airline',
-
+      title: 'American Airlines',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -33,7 +33,7 @@ class FirstScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('American Airline'),
+        title: Text('American Airlines'),
       ),
       body: Center(
         child: Column(
@@ -143,7 +143,7 @@ class BookingPage1 extends State<BookingPage> {
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text('American Airline'),
+        title: Text('American Airlines'),
         centerTitle: true,
       ),
       body: new Container(
@@ -262,12 +262,14 @@ class Flight{
   String to;
   String departTime;
   String arriveTime;
+  String flightNum;
 
   Flight(
       this.from,
       this.to,
       this.departTime,
-      this.arriveTime
+      this.arriveTime,
+      this.flightNum,
       );
 }
 
@@ -672,6 +674,7 @@ class FlightsMockData {
   static var to = ["BLR", "JAI", "BBI", "CCU", "AMD"];
   static var departTime = ["5:50 AM", "3:30 PM", "12:00PM", "4:20 AM", "1:00 PM"];
   static var arriveTime = ["8:40 AM", "7:25 PM", "4:00 PM", "8:21 AM", "3:25 PM"];
+  static var flightsNum = ["1111", "2222", "3333", "444", "555"];
 
   //static var from = List();
   //static var to = List();
@@ -683,7 +686,8 @@ class FlightsMockData {
         from[position],
         to[position],
         departTime[position],
-        arriveTime[position]);
+        arriveTime[position],
+        flightsNum[position]);
   }
 }
 class FlightListScreen extends StatefulWidget {
@@ -720,6 +724,7 @@ class _FlightListState extends State<FlightListScreen> {
           FlightsMockData.to = List();
           FlightsMockData.departTime = List();
           FlightsMockData.arriveTime = List();
+          FlightsMockData.flightsNum = List();
         });
 
         for (final i in flight) {
@@ -731,6 +736,7 @@ class _FlightListState extends State<FlightListScreen> {
                 i.departureTime.split('T')[1].split('.')[0]);
             FlightsMockData.arriveTime.add(
                 i.arrivalTime.split('T')[1].split('.')[0]);
+            FlightsMockData.flightsNum.add(i.flightNumber);
           });
         }
 
@@ -939,6 +945,7 @@ class FlightCard extends StatelessWidget{
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 _cityStyle(flight.from, flight.departTime),
+                new Text(flight.flightNum),
                 Icon(Icons.airplanemode_active),
                 _cityStyle(flight.to, flight.arriveTime),
               ],
@@ -1424,6 +1431,7 @@ class ShopCart extends StatelessWidget{
     return new MaterialApp(
       title:'Startup Name Generator',
       home: new RandomWords(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

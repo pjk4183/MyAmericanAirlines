@@ -1,6 +1,11 @@
-# my_app
+# My_AmericanAirlines
+This project is used for Hack Arizona 2020.
 
-A new Flutter project.
+## Team Members
+- Lihao Guo
+- Runnan Zhou
+- Jiacheng He
+- Wen Zhu
 
 ## Getting Started
 

@@ -7,6 +7,23 @@ This project is used for Hack Arizona 2020.
 - Jiacheng He
 - Wen Zhu
 
+## Our goals supported by functionalities
+- [x] Improving customers experience
+- [x] boosting operational efficiency and employee performance
+- [x] enhancing brand image by well-designed interface
+- [x] API Utilization
+  - We depolied own server to retrive the data by simulating AA's Server
+
+## Functionality
+- Booking tickets
+  - Shows available tickets
+  - search flights by city and date
+- ordering food
+- query the flight by flight number
+- display airport map related to the departure airport
+- warm remind time cost from current location to airport
+- showing up the information related to trip
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'cli.dart' as cli;
 
@@ -102,7 +103,8 @@ class BookingPage extends StatefulWidget {
 }
 
 class BookingPage1 extends State<BookingPage> {
-  final TextEditingController controller = new TextEditingController();
+  final TextEditingController controller1 = new TextEditingController();
+  final TextEditingController controller2 = new TextEditingController();
   String departure = "Tucson";
   String arrival = "Phoenix";
 
@@ -125,6 +127,14 @@ class BookingPage1 extends State<BookingPage> {
       setState(() {
         selectedDate = picked;
       });
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    controller1.dispose();
+    controller2.dispose();
+    super.dispose();
   }
 
   @override
@@ -155,11 +165,12 @@ class BookingPage1 extends State<BookingPage> {
                   Expanded(
                     child: TextField(
                       decoration: new InputDecoration(hintText: "Tucson"),
-                      onSubmitted: (String str) {
-                        setState(() {
-                          departure = str;
-                        });
-                      },
+                      controller: controller1,
+//                      onSubmitted: (String str) {
+//                        setState(() {
+//                          departure = str;
+//                        });
+//                      },
                     ),
                   ),
                 ],
@@ -175,11 +186,12 @@ class BookingPage1 extends State<BookingPage> {
                   Expanded(
                     child: TextField(
                       decoration: new InputDecoration(hintText: "Phoneix"),
-                      onSubmitted: (String str) {
-                        setState(() {
-                          arrival = str;
-                        });
-                      },
+                      controller: controller2,
+//                      onSubmitted: (String str) {
+//                        setState(() {
+//                          arrival = str;
+//                        });
+//                      },
                     ),
                   ),
                   //TableCalendar(),
@@ -212,7 +224,7 @@ class BookingPage1 extends State<BookingPage> {
             context,
             MaterialPageRoute(
               builder: (context) => BookingScreen(
-                  loc: new Location(departure, arrival, selectedDate)),
+                  loc: new Location(controller1.text, controller2.text, selectedDate)),
             ),
           );
         },
@@ -245,6 +257,20 @@ class Info {
       this.seat, this.type);
 }
 
+class Flight{
+  String from;
+  String to;
+  String departTime;
+  String arriveTime;
+
+  Flight(
+      this.from,
+      this.to,
+      this.departTime,
+      this.arriveTime
+      );
+}
+
 class BookingScreen extends StatefulWidget {
   final Location loc;
 
@@ -255,10 +281,11 @@ class BookingScreen extends StatefulWidget {
 }
 
 class BookingPage2 extends State<BookingScreen> {
-  int _adultCount = 0;
+  int _adultCount = 1;
   int _childCount = 0;
   int seat = 1;
   int type = 2;
+  Timer timer;
 
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -276,38 +303,201 @@ class BookingPage2 extends State<BookingScreen> {
           children: <Widget>[
             new Row(
               children: <Widget>[
-                Expanded(
-                  child: Text('Adult    '),
+                Text("Adult            "),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Align(
+                    child: Text(
+                      '$_adultCount',
+                      style: TextStyle(color: Color(0xff333333), fontSize: 20),
+                    ),
+                  ),
                 ),
-                Expanded(
-                    child: IconButton(
-                        icon: new Icon(Icons.remove),
-                        onPressed: () => setState(() => _adultCount--))),
-                Expanded(
-                  child: Text(_adultCount.toString()),
+                Row(
+                  children: <Widget>[
+                    new GestureDetector(child: Container(
+                      width: 50,
+                      height: 30,
+                      child: Icon(Icons.remove),
+                    ),
+                      onTap: () {
+                        setState(() {
+                          if (_adultCount <= 1) {
+                            return;
+                          }
+                          _adultCount--;
+                        });
+                      },
+                      onTapDown: (e) {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                        if (_adultCount <= 1) {
+                          return;
+                        }
+                        timer = new Timer.periodic(Duration(milliseconds: 1000), (e) {
+                          setState(() {
+                            if (_adultCount <= 1) {
+                              return;
+                            }
+                            _adultCount--;
+                          });
+                        });
+                      },
+                      onTapUp: (e) {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                      },
+                      onTapCancel: () {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                      },
+                    ),
+                    new GestureDetector(
+                      child: Container(
+                        width: 50,
+                        height: 30,
+                        child: Icon(Icons.add),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          if (_adultCount >= 999999999) {
+                            return;
+                          }
+                          _adultCount++;
+                        });
+                      },
+                      onTapDown: (e) {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                        if (_adultCount >= 999999999) {
+                          return;
+                        }
+                        timer = new Timer.periodic(Duration(milliseconds: 1000), (e) {
+                          setState(() {
+                            if (_adultCount >= 999999999) {
+                              return;
+                            }
+                            _adultCount++;
+                          });
+                        });
+                      },
+                      onTapUp: (e) {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                      },
+                      onTapCancel: () {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                Expanded(
-                    child: IconButton(
-                        icon: new Icon(Icons.add),
-                        onPressed: () => setState(() => _adultCount++))),
               ],
             ),
+
             new Row(
               children: <Widget>[
-                Expanded(
-                  child: Text('Children    '),
+                Text("Children       "),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Align(
+                    child: Text(
+                      '$_childCount',
+                      style: TextStyle(color: Color(0xff333333), fontSize: 20),
+                    ),
+                  ),
                 ),
-                Expanded(
-                    child: IconButton(
-                        icon: new Icon(Icons.remove),
-                        onPressed: () => setState(() => _childCount--))),
-                Expanded(
-                  child: Text(_childCount.toString()),
+                Row(
+                  children: <Widget>[
+                    new GestureDetector(child: Container(
+                      width: 50,
+                      height: 30,
+                      child: Icon(Icons.remove),
+                    ),
+                      onTap: () {
+                        setState(() {
+                          if (_childCount <= 0) {
+                            return;
+                          }
+                          _childCount--;
+                        });
+                      },
+                      onTapDown: (e) {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                        if (_childCount <= 0) {
+                          return;
+                        }
+                        timer = new Timer.periodic(Duration(milliseconds: 1000), (e) {
+                          setState(() {
+                            if (_childCount <= 0) {
+                              return;
+                            }
+                            _childCount--;
+                          });
+                        });
+                      },
+                      onTapUp: (e) {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                      },
+                      onTapCancel: () {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                      },
+                    ),
+                    new GestureDetector(
+                      child: Container(
+                        width: 50,
+                        height: 30,
+                        child: Icon(Icons.add),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          if (_childCount >= 999999999) {
+                            return;
+                          }
+                          _childCount++;
+                        });
+                      },
+                      onTapDown: (e) {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                        if (_childCount >= 999999999) {
+                          return;
+                        }
+                        timer = new Timer.periodic(Duration(milliseconds: 1000), (e) {
+                          setState(() {
+                            if (_childCount >= 999999999) {
+                              return;
+                            }
+                            _childCount++;
+                          });
+                        });
+                      },
+                      onTapUp: (e) {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                      },
+                      onTapCancel: () {
+                        if (timer != null) {
+                          timer.cancel();
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                Expanded(
-                    child: IconButton(
-                        icon: new Icon(Icons.add),
-                        onPressed: () => setState(() => _childCount++))),
               ],
             ),
             const SizedBox(height: 50),
@@ -454,12 +644,14 @@ class BookingPage3 extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          /**
-              Navigator.of(context).push(
-              MaterialPageRoute<Null>(builder: (BuildContext context) {
-              return new ConfirmScreen();
-              }));
-           **/
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FlightListScreen(
+                  locInfo: new Location(info.departure, info.arrival,
+                      info.date)),
+            ),
+          );
         },
         label: Text('CONFIRM'),
         icon: Icon(Icons.thumb_up),
@@ -468,6 +660,298 @@ class BookingPage3 extends StatelessWidget {
     );
   }
 }
+
+
+// ---------------------------------TESTING--------------------------------
+class FlightsMockData {
+
+
+  static var count = 5;
+
+  static var from = ["BBI", "CCU", "HYD", "BOM", "JAI"];
+  static var to = ["BLR", "JAI", "BBI", "CCU", "AMD"];
+  static var departTime = ["5:50 AM", "3:30 PM", "12:00PM", "4:20 AM", "1:00 PM"];
+  static var arriveTime = ["8:40 AM", "7:25 PM", "4:00 PM", "8:21 AM", "3:25 PM"];
+
+  //static var from = List();
+  //static var to = List();
+  //static var departTime = List();
+  //static var arriveTime = List();
+
+  static getFlights(int position) {
+    return Flight(
+        from[position],
+        to[position],
+        departTime[position],
+        arriveTime[position]);
+  }
+}
+class FlightListScreen extends StatefulWidget {
+  final Location locInfo;
+  FlightListScreen({Key key, @required this.locInfo}) : super(key: key);
+
+  @override
+  _FlightListState createState() => _FlightListState();
+}
+
+class _FlightListState extends State<FlightListScreen> {
+  bool noFlights = false;
+
+  @override
+  void initState() {
+    super.initState();
+    String date = widget.locInfo.date.toString().split(" ")[0];
+    String departure = widget.locInfo.departure;
+    String arrival = widget.locInfo.arrival;
+
+    print(date);
+    print(departure);
+    print(arrival);
+
+    departure = cli.CityToCode(departure);
+    arrival = cli.CityToCode(arrival);
+
+    cli.fetchPost(date: date, origin : departure, dst: arrival).then((flight) {
+
+      if (flight.length > 0){
+        setState(() {
+
+          FlightsMockData.from = List();
+          FlightsMockData.to = List();
+          FlightsMockData.departTime = List();
+          FlightsMockData.arriveTime = List();
+        });
+
+        for (final i in flight) {
+          print(i);
+          setState(() {
+            FlightsMockData.from.add(i.origin_code);
+            FlightsMockData.to.add(i.dest_code);
+            FlightsMockData.departTime.add(
+                i.departureTime.split('T')[1].split('.')[0]);
+            FlightsMockData.arriveTime.add(
+                i.arrivalTime.split('T')[1].split('.')[0]);
+          });
+        }
+
+      }else{
+        setState(() {
+          noFlights = true;
+        });
+      }
+//      FlightsMockData.from = ["BBI", "CCU", "HYD", "BOM", "JAI"];
+//      FlightsMockData.to = ["BLR", "JAI", "BBI", "CCU", "AMD"];
+//      FlightsMockData.departTime = ["5:50 AM", "3:30 PM", "12:00PM", "4:20 AM", "1:00 PM"];
+//      FlightsMockData.arriveTime = ["8:40 AM", "7:25 PM", "4:00 PM", "8:21 AM", "3:25 PM"];
+
+    }, onError: (e) {
+      print(e);
+    });
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (noFlights) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: new Text('Flight not found!'),
+        ),
+      );
+    }
+    Flight flight;
+    return Scaffold(
+      appBar: AppBar(
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+            itemCount: FlightsMockData.count,
+            itemBuilder: (context, index) {
+              flight = FlightsMockData.getFlights(index);
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: FlightCard(
+                  flight: flight,
+                  isClickable: true,
+                ),
+              );
+            }
+        ),
+      ),
+    );
+  }
+}
+
+class FlightDetailScreen extends StatelessWidget{
+
+  final String passengerName;
+  final Flight flight;
+
+  FlightDetailScreen({
+    this.passengerName,
+    this.flight
+  });
+
+  @override
+  Widget build(BuildContext context) {
+
+
+
+    getRichText(title, name){
+      return RichText(
+        text: TextSpan(
+            style: TextStyle(fontSize: 16.0, color: Colors.black),
+            children: <TextSpan>[
+              TextSpan(text: title, style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(text: name, style: TextStyle(color: Colors.grey)),
+            ]
+        ),
+      );
+    }
+
+
+    final _passengerDetailsCard =  Card(
+      elevation: 5.0,
+      margin: EdgeInsets.all(0.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+      child: Container(
+        height: 200.0,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            getRichText("Passenger ", passengerName),
+            SizedBox(height: 10.0,),
+            getRichText("Date ", "24/05/21"),
+            SizedBox(height: 10.0,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                getRichText("Flight ", "INDIGO042B"),
+                SizedBox(width: 10.0,),
+                getRichText("Class ", "Business")
+              ],
+            ),
+            SizedBox(height: 10.0,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                getRichText("Seat ", "21B"),
+                SizedBox(width: 10.0,),
+                getRichText("Gate ", "17A")
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+
+    return Scaffold(
+        appBar: AppBar(
+          elevation: 0.0,
+        ),
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          //color: Colors.black,
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: <Widget>[
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height*0.30,
+                color: Colors.amber,
+              ),
+              Positioned(
+                top: MediaQuery.of(context).size.width*0.30,
+                child: Container(
+                  width: MediaQuery.of(context).size.width*0.90,
+                  child: Column(
+                    children: <Widget>[
+                      FlightCard(
+                        flight: flight,
+                        isClickable: false,
+                      ),
+                      SizedBox(height: 20.0,),
+                      _passengerDetailsCard,
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )
+    );
+  }
+}
+
+class FlightCard extends StatelessWidget{
+  final Flight flight;
+  final String fullName;
+  final bool isClickable;
+
+  FlightCard({this.flight, this.fullName, @required this.isClickable});
+
+  _cityStyle(code, time){
+    return Expanded(
+      child: Column(
+        children: <Widget>[
+          Text(code, style: TextStyle(
+              color: Colors.black,
+              fontSize: 40.0,
+              fontWeight: FontWeight.bold
+          ),),
+          SizedBox(height: 10.0,),
+          Text(time, style: TextStyle(color: Colors.grey, fontSize: 14.0),)
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: (){
+        isClickable?
+        Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (context)
+                => FlightDetailScreen(
+                  passengerName: fullName,
+                  flight: flight,
+                )
+            )
+        ):null;
+      },
+
+      child: Card(
+        elevation: 5.0,
+        margin: EdgeInsets.all(0.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+        child: Container(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+                vertical:20.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                _cityStyle(flight.from, flight.departTime),
+                Icon(Icons.airplanemode_active),
+                _cityStyle(flight.to, flight.arriveTime),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+}
+// ---------------------------------TESTING--------------------------------
+
 
 class FlightInfo {
   final TextEditingController myController;
@@ -600,6 +1084,8 @@ class _flightState extends State<FlightInfoScreen> {
   int duration_h = 0;
   int duration_m = 0;
 
+  String toAirportInfo = '';
+
   @override
   void initState() {
     super.initState();
@@ -619,9 +1105,9 @@ class _flightState extends State<FlightInfoScreen> {
           dest_city = flight.dest_city;
           dest_code = flight.dest_code;
           departureTime = flight.departureTime.split('T')[1].split('.')[0];
-          origin_timezone = flight.origin_timezone;
+          origin_timezone = flight.origin_timezone.split('/')[1];
           arrivalTime = flight.arrivalTime.split('T')[1].split('.')[0];
-          dest_timezone = flight.dest_timezone;
+          dest_timezone = flight.dest_timezone.split('/')[1];
           duration_h = flight.duration_h;
           duration_m = flight.duration_m;
         });
@@ -633,7 +1119,10 @@ class _flightState extends State<FlightInfoScreen> {
       print(e);
     });
 
-    print(currFlight);
+    cli.ToAirport(destinations: 'TUS').then((d) => toAirportInfo =
+        "distance to the airport is ${d[0]}, estimate taking ${d[1]} plus traffic time ${d[2]}");
+
+    print(toAirportInfo);
   }
 
   @override
@@ -758,11 +1247,31 @@ class _flightState extends State<FlightInfoScreen> {
     );
 
     Widget NavSection = Container(
-      height: 300.0,
+      height: 120.0,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        
+        children: [
+          new Text(toAirportInfo),
+          SizedBox(height: 10.0,),
+          RaisedButton(
+              onPressed:(){
+                Navigator.push(
+                  context,new MaterialPageRoute(builder:(context)=> new ShopCart()),
+                );
+              },
+              color:Colors.cyan,
+              splashColor: Colors.red,
+              padding:EdgeInsets.symmetric(vertical:15.0,horizontal:25.0),
+              child:Text(
+                  "Shop items",
+                  style:TextStyle(
+                    fontSize:20.0,
+                    color:Colors.white,
+                  )
+              )
+          ),
+        ],
       ),
+
     );
 
     Widget AirportMapSection = Container(
@@ -783,10 +1292,7 @@ class _flightState extends State<FlightInfoScreen> {
 
   Widget _buildChild(Widget CitySection, Widget TimeSection, Widget InfoSection,
       Widget NavSection, Widget AirportMapSection) {
-    print(currFlight);
-    print('top');
     if (currFlight == null) {
-      print('here1');
       return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -797,7 +1303,6 @@ class _flightState extends State<FlightInfoScreen> {
         ),
       );
     } else {
-      print('here2');
       return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -819,5 +1324,106 @@ class _flightState extends State<FlightInfoScreen> {
         ),
       );
     }
+  }
+}
+
+class RandomWords extends StatefulWidget{
+  @override
+  createState()=> new RandomWordsState();
+}
+class RandomWordsState extends State<RandomWords>{
+  // final _suggestions=<WordPair>[];
+  final _saved = new List<String>();
+  final _biggerFont = const TextStyle(fontSize:18.0);
+  @override
+  Widget build(BuildContext context){
+    return new Scaffold(
+      appBar: new AppBar(
+        title:new Text('Menu'),
+        actions: <Widget>[
+          new IconButton(icon:new Icon(Icons.list),onPressed: _pushSaved,)
+        ],
+      ),
+      body:_buildSuggestions(),
+    );
+  }
+  Widget _buildSuggestions(){
+    List<String> options = ['water','coke','lemonade','book','wine','beer',
+      ''];
+
+    return new ListView.builder(
+        padding:const EdgeInsets.all(16.0),
+        itemBuilder: (context,i){
+          if (i.isOdd) return new Divider();
+          final index = i~/2;
+          if (index>= 5){
+            return null;
+          }
+          return _buildRow(options[index]);
+        }
+    );
+  }
+  Widget _buildRow(String Pair){
+    final alreadySaved = _saved.contains(Pair);
+    return new ListTile(
+        title:new Text(
+          Pair,
+
+          style:_biggerFont,
+        ),
+        trailing : new Icon(
+          alreadySaved? Icons.favorite:Icons.favorite_border,
+          color:alreadySaved?Colors.red:null,
+        ),
+        onTap:(){
+          setState(() {
+            if (alreadySaved){
+              _saved.remove(Pair);
+            }else{
+              _saved.add(Pair);
+            }
+          });
+        }
+    );
+  }
+  void _pushSaved(){
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+        builder: (context) {
+          final tiles = _saved.map(
+                (Pair) {
+              return new ListTile(
+                title: new Text(
+                  Pair,
+                  style: _biggerFont,
+                ),
+              );
+            },
+          );
+          final divided = ListTile
+              .divideTiles(
+            context: context,
+            tiles: tiles,
+          )
+              .toList();
+          return new Scaffold(
+            appBar: new AppBar(
+              title:new Text('Check Out'),
+            ),
+            body:new ListView(children:divided),
+
+          );
+        },
+      ),
+    );
+  }
+}
+class ShopCart extends StatelessWidget{
+  @override
+  Widget build(BuildContext context){
+    return new MaterialApp(
+      title:'Startup Name Generator',
+      home: new RandomWords(),
+    );
   }
 }

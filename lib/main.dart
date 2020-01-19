@@ -609,7 +609,7 @@ class _flightState extends State<FlightInfoScreen> {
     print(date);
     print(num);
 
-    cli.fetchPost(flightnum: num).then((flight) {
+    cli.fetchPost(date: date, flightnum: num).then((flight) {
       if (flight != null) {
         print("Found flight number : ${flight.flightNumber}");
         setState(() {
@@ -691,8 +691,7 @@ class _flightState extends State<FlightInfoScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 new Text('Duration'),
-                new Text(
-                    '${duration_h}hr${duration_m}min'),
+                new Text('${duration_h}hr${duration_m}min'),
               ],
             ),
           ),
@@ -709,6 +708,7 @@ class _flightState extends State<FlightInfoScreen> {
       ),
     );
 
+    // we did not have enough information APIs for this section
     Widget InfoSection = Container(
       height: 50.0,
       child: Row(
@@ -757,9 +757,13 @@ class _flightState extends State<FlightInfoScreen> {
       ),
     );
 
-//  Widget NavSection = Container(
-//
-//  );
+    Widget NavSection = Container(
+      height: 300.0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        
+      ),
+    );
 
     Widget AirportMapSection = Container(
       height: 340.0,
@@ -773,12 +777,12 @@ class _flightState extends State<FlightInfoScreen> {
       ),
     );
     return new Container(
-        child: _buildChild(
-            CitySection, TimeSection, InfoSection, AirportMapSection));
+        child: _buildChild(CitySection, TimeSection, InfoSection, NavSection,
+            AirportMapSection));
   }
 
   Widget _buildChild(Widget CitySection, Widget TimeSection, Widget InfoSection,
-      Widget AirportMapSection) {
+      Widget NavSection, Widget AirportMapSection) {
     print(currFlight);
     print('top');
     if (currFlight == null) {
@@ -807,6 +811,8 @@ class _flightState extends State<FlightInfoScreen> {
             TimeSection,
             SizedBox(height: 20.0),
             InfoSection,
+            SizedBox(height: 20.0),
+            NavSection,
             SizedBox(height: 20.0),
             AirportMapSection,
           ],
